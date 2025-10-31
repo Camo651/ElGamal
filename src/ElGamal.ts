@@ -22,6 +22,20 @@ export const encrypt = (message: bigint, publicKey: PublicKey, ephemeralKey: big
 
 export const decrypt = (ciphertext: Ciphertext, privateKey: bigint, prime: bigint): bigint => {
     const x = (ciphertext.c1 ** privateKey) % prime;
-    const m = (ciphertext.c2 * ( x ** (prime - BigInt(2)) )) % prime;
+    const xInverse = modularInverse(x, prime);
+    const m = (ciphertext.c2 * xInverse) % prime;
     return m;
+}
+
+export const getMessageFromReusedEphemeralKey = (message1: bigint, ciphertext1: Ciphertext, ciphertext2: Ciphertext, ephemeralKey: bigint, publicKey: PublicKey): bigint => {
+    if(ciphertext1.c1 !== ciphertext2.c1) {
+        throw new Error("Ephemeral key not reused");
+    }
+    const c1_2Inverse = modularInverse(ciphertext1.c2, publicKey.prime);
+    const m2 = (ciphertext2.c2 * c1_2Inverse * message1) % publicKey.prime;
+    return m2;
+}
+
+const modularInverse = (a: bigint, prime: bigint): bigint => {
+    return a ** (prime - BigInt(2)) % prime;
 }
