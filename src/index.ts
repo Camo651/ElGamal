@@ -1,4 +1,7 @@
 import { getPublicKey, encrypt, decrypt, getMessageFromReusedEphemeralKey } from "./ElGamal";
+import { FastExponentTests } from "./SquareAndMultiple";
+
+FastExponentTests();
 
 interface ElGamalTest {
     prime: bigint;
